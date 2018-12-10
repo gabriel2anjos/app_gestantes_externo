@@ -670,6 +670,169 @@ function getAllLoteColeta(req, res, next) {
     }
 }
 
+function getAllAnoReferencia(req, res, next) {
+    if (req.headers['token'] == index.SECRET_KEY || noToken) {
+        let op = "SELECT * FROM anoreferencia ";
+        let query = req.query;
+        let uid = req.params.uid;
+        if (uid) {
+            op += " WHERE codanoreferencia=CAST(" + uid + " AS INTEGER)";
+        }
+        db.any(op)
+            .then(function (data) {
+                res.status(200)
+                    .json(data);
+            })
+            .catch(function (err) {
+                console.log(err);
+                return next(err);
+            });
+    }
+    else {
+        invalidKey(res);
+    }
+}
+
+function getAllRefMensal(req, res, next) {
+    if (req.headers['token'] == index.SECRET_KEY || noToken) {
+        let op = "SELECT * FROM refmensal ";
+        let query = req.query;
+        let uid = req.params.uid;
+        if (uid) {
+            op += " WHERE codrefmensal=CAST(" + uid + " AS INTEGER)";
+        }
+        db.any(op)
+            .then(function (data) {
+                res.status(200)
+                    .json(data);
+            })
+            .catch(function (err) {
+                console.log(err);
+                return next(err);
+            });
+    }
+    else {
+        invalidKey(res);
+    }
+}
+
+function getAllStatusRefMensal(req, res, next) {
+    if (req.headers['token'] == index.SECRET_KEY || noToken) {
+        let op = "SELECT * FROM statusrefmensal ";
+        let query = req.query;
+        let uid = req.params.uid;
+        if (uid) {
+            op += " WHERE codstatusrefmensal=CAST(" + uid + " AS INTEGER)";
+        }
+        db.any(op)
+            .then(function (data) {
+                res.status(200)
+                    .json(data);
+            })
+            .catch(function (err) {
+                console.log(err);
+                return next(err);
+            });
+    }
+    else {
+        invalidKey(res);
+    }
+}
+
+function getAllResultadoTexto(req, res, next) {
+    if (req.headers['token'] == index.SECRET_KEY || noToken) {
+        let op = "SELECT * FROM resultadotexto ";
+        let query = req.query;
+        let uid = req.params.uid;
+        if (uid) {
+            op += " WHERE codresultadotexto=CAST(" + uid + " AS INTEGER)";
+        }
+        db.any(op)
+            .then(function (data) {
+                res.status(200)
+                    .json(data);
+            })
+            .catch(function (err) {
+                console.log(err);
+                return next(err);
+            });
+    }
+    else {
+        invalidKey(res);
+    }
+}
+
+function getAllObsReconvocacao(req, res, next) {
+    if (req.headers['token'] == index.SECRET_KEY || noToken) {
+        let op = "SELECT * FROM obsreconvocacao ";
+        let query = req.query;
+        let uid = req.params.uid;
+        if (uid) {
+            op += " WHERE codobsreconvocacao=CAST(" + uid + " AS INTEGER)";
+        }
+        else if (query) {
+            op+="WHERE ";
+            if (query['codcoleta']) {
+                op +=" reconvocacao_codreconvocacao=CAST(" + query['codcoleta'] + " AS INTEGER) AND";
+            }
+            if (op.slice(-4)==' AND'){
+                op = op.slice(-0,-4);
+            }
+            if (op.slice(-6)=='WHERE '){
+                op = op.slice(-0,-6);
+            }
+        }
+        db.any(op)
+            .then(function (data) {
+                res.status(200)
+                    .json(data);
+            })
+            .catch(function (err) {
+                console.log(err);
+                return next(err);
+            });
+    }
+    else {
+        invalidKey(res);
+    }
+}
+
+
+function getAllExameTriagem(req, res, next) {
+    if (req.headers['token'] == index.SECRET_KEY || noToken) {
+        let op = "SELECT * FROM exametriagem ";
+        let query = req.query;
+        let uid = req.params.uid;
+        if (uid) {
+            op += " WHERE codexametriagem=CAST(" + uid + " AS INTEGER)";
+        }
+        else if (query) {
+            op+="WHERE ";
+            if (query['codcoleta']) {
+                op +=" coleta_codcoleta=CAST(" + query['codcoleta'] + " AS INTEGER) AND";
+            }
+            if (op.slice(-4)==' AND'){
+                op = op.slice(-0,-4);
+            }
+            if (op.slice(-6)=='WHERE '){
+                op = op.slice(-0,-6);
+            }
+        }
+        db.any(op)
+            .then(function (data) {
+                res.status(200)
+                    .json(data);
+            })
+            .catch(function (err) {
+                console.log(err);
+                return next(err);
+            });
+    }
+    else {
+        invalidKey(res);
+    }
+}
+
 
 module.exports = {
     getAllGestantes: getAllGestantes,
@@ -695,7 +858,10 @@ module.exports = {
     getAllCodItemExameConf: getAllCodItemExameConf,
     getAllItemParametroExameConf: getAllItemParametroExameConf,
     getAllLoteColeta: getAllLoteColeta,
-
-
-
+    getAllAnoReferencia: getAllAnoReferencia,
+    getAllRefMensal: getAllRefMensal,
+    getAllStatusRefMensal: getAllStatusRefMensal,
+    getAllResultadoTexto: getAllResultadoTexto,
+    getAllObsReconvocacao: getAllObsReconvocacao,
+    getAllExameTriagem: getAllExameTriagem,
 };

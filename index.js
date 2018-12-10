@@ -27,12 +27,12 @@ app.get('/parametro-exame-confirmatorio/:uid?', db.getAllParametroExameConfirmat
 app.get('/cod-item-exame-conf/:uid?', db.getAllCodItemExameConf);
 app.get('/item-parametro-exame-conf/:uid?', db.getAllItemParametroExameConf);
 app.get('/lote-coleta/:uid?', db.getAllLoteColeta);
-// app.get('ano-referencia');
-// app.get('ref-mensal');
-// app.get('status-ref-mensal');
-// app.get('resultado-texto');
-// app.get('obs-reconvocacao');
-// app.get('exame-triagem');
+app.get('/ano-referencia/:uid?', db.getAllAnoReferencia);
+app.get('/ref-mensal/:uid?', db.getAllRefMensal);
+app.get('/status-ref-mensal/:uid?', db.getAllStatusRefMensal);
+app.get('/resultado-texto/:uid?', db.getAllResultadoTexto);
+app.get('/obs-reconvocacao/:uid?', db.getAllObsReconvocacao);
+app.get('/exame-triagem/:uid?', db.getAllExameTriagem);
 
 function homePage(req, res, next) {
     res.status(200);
