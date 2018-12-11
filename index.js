@@ -1,7 +1,12 @@
 var express = require('express');
 var router = express.Router();
+var cors = require('cors')
 var app = express();
+app.use(cors())
 var db = require('./queries');
+
+
+
 
 app.get('/', homePage);
 app.get('/gestante/:uid?', db.getAllGestantes);
@@ -33,6 +38,10 @@ app.get('/status-ref-mensal/:uid?', db.getAllStatusRefMensal);
 app.get('/resultado-texto/:uid?', db.getAllResultadoTexto);
 app.get('/obs-reconvocacao/:uid?', db.getAllObsReconvocacao);
 app.get('/exame-triagem/:uid?', db.getAllExameTriagem);
+app.get('*', function(req, res){
+    res.send('what???', 404);
+  });
+
 
 function homePage(req, res, next) {
     res.status(200);
