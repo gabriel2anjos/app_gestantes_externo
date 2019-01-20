@@ -70,13 +70,42 @@ function getAllGestantes(req, res, next) {
 
 function patchGestantes(req, res, next){
     if (req.headers['token'] == index.SECRET_KEY || noToken) {
-        let op = "SELECT * FROM codgestante ";
-        let query = req.query;
+        let op = "UPDATE gestante SET ";
+        let body = req.body;
         let uid = req.params.uid;
+        let flag = 0;
         if (uid) {
-            op += " WHERE codstatusassverso=CAST(" + uid + " AS INTEGER)";
+            for (var chave in body){
+                if (chave == 'celulargestante'){
+                    flag = 1;
+                    let valor = body[chave];
+                    op+="celulargestante="+valor+", ";
+                }
+                else if (chave == 'telefonegestante'){
+                    flag = 1;
+                    let valor = body[chave];
+                    op+="telefonegestante="+valor+", ";
+                }
+            }
+            if(!flag){
+                return res.status(500).json({status:"Nenhum parametro passado"});
+            }
+            else{
+                if (op.slice(-2)==', '){
+                    op = op.slice(-0,-2);
+                }
+                op += " WHERE codgestante=CAST(" + uid + " AS INTEGER)";
+                db.any(op)
+                .then(function (data) {
+                    res.status(200)
+                        .json({status:"Escrito"});
+                })
+                .catch(function (err) {
+                    console.log(err);
+                    return next(err);
+                });
+            }
         }
-        res.status(200);
     }
     else {
         invalidKey(res);
