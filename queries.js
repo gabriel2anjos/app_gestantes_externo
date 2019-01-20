@@ -68,6 +68,21 @@ function getAllGestantes(req, res, next) {
     }
 }
 
+function patchGestantes(req, res, next){
+    if (req.headers['token'] == index.SECRET_KEY || noToken) {
+        let op = "SELECT * FROM codgestante ";
+        let query = req.query;
+        let uid = req.params.uid;
+        if (uid) {
+            op += " WHERE codstatusassverso=CAST(" + uid + " AS INTEGER)";
+        }
+        res.status(200);
+    }
+    else {
+        invalidKey(res);
+    }
+}
+
 function getAllStatusAssVerso(req, res, next) {
     if (req.headers['token'] == index.SECRET_KEY || noToken) {
         let op = "SELECT * FROM statusassverso ";
@@ -836,6 +851,7 @@ function getAllExameTriagem(req, res, next) {
 
 module.exports = {
     getAllGestantes: getAllGestantes,
+    patchGestantes: patchGestantes,
     getAllStatusAssVerso: getAllStatusAssVerso,
     getAllRegiaoSaude: getAllRegiaoSaude,
     getAllCidade: getAllCidade,

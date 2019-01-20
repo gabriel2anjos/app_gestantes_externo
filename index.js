@@ -9,7 +9,7 @@ var db = require('./queries');
 
 
 app.get('/', homePage);
-app.get('/gestante/:uid?', db.getAllGestantes);
+app.get('/gestante/:uid?', db.getAllGestantes).patch('/gestante/:uid', db.patchGestantes);
 app.get('/status-ass-verso/:uid?', db.getAllStatusAssVerso);
 app.get('/regiao-saude/:uid?', db.getAllRegiaoSaude);
 app.get('/cidade/:uid?', db.getAllCidade);
@@ -39,7 +39,7 @@ app.get('/resultado-texto/:uid?', db.getAllResultadoTexto);
 app.get('/obs-reconvocacao/:uid?', db.getAllObsReconvocacao);
 app.get('/exame-triagem/:uid?', db.getAllExameTriagem);
 app.get('*', function(req, res){
-    res.send('what???', 404);
+    res.send(404);
   });
 
 
@@ -50,7 +50,7 @@ function homePage(req, res, next) {
     })
 }
 
-var server = app.listen(3001, function () {
+var server = app.listen(29616, function () {
     var host = server.address().address
     var port = server.address().port
 
