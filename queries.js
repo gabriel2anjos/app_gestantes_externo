@@ -81,10 +81,30 @@ function patchGestantes(req, res, next){
                     let valor = body[chave];
                     op+="celulargestante="+valor+", ";
                 }
+                else if (chave == 'emailgestante'){
+                    flag = 1;
+                    let valor = body[chave];
+                    op+="emailgestante="+valor+", ";
+                }
                 else if (chave == 'telefonegestante'){
                     flag = 1;
                     let valor = body[chave];
                     op+="telefonegestante="+valor+", ";
+                }
+                else if (chave == 'rggestante'){
+                    flag = 1;
+                    let valor = body[chave];
+                    op+="rggestante="+valor+", ";
+                }
+                else if (chave == 'tiposangabogestante'){
+                    flag = 1;
+                    let valor = body[chave];
+                    op+="tiposangabogestante="+valor+", ";
+                }
+                else if (chave == 'fatorrhgestante'){
+                    flag = 1;
+                    let valor = body[chave];
+                    op+="fatorrhgestante="+valor+", ";
                 }
             }
             if(!flag){
