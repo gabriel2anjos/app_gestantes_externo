@@ -19,10 +19,10 @@ function invalidKey(res) {
 
 var pgp = require('pg-promise')(options);
 const cn = {
-    host: 'ppg_go2.postgresql.dbaas.com.br',
+    host: 'ppn_go.postgresql.dbaas.com.br',
     port: 5432,
-    database: 'ppg_go2',
-    user: 'ppg_go2',
+    database: 'ppn_go',
+    user: 'ppn_go',
     password: 'R@g761206'
 };
 var db = pgp(cn);
