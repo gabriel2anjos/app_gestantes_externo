@@ -79,32 +79,34 @@ function patchGestantes(req, res, next){
                 if (chave == 'celulargestante'){
                     flag = 1;
                     let valor = body[chave];
-                    op+="celulargestante="+valor+", ";
+                    op+="celulargestante='"+valor+"', ";
                 }
                 else if (chave == 'emailgestante'){
                     flag = 1;
                     let valor = body[chave];
-                    op+="emailgestante="+valor+", ";
+                    op+="emailgestante='"+valor+"', ";
                 }
                 else if (chave == 'telefonegestante'){
                     flag = 1;
                     let valor = body[chave];
-                    op+="telefonegestante="+valor+", ";
+                    op+="telefonegestante='"+valor+"', ";
                 }
                 else if (chave == 'rggestante'){
                     flag = 1;
                     let valor = body[chave];
-                    op+="rggestante="+valor+", ";
+                    op+="rggestante='"+valor+"', ";
                 }
                 else if (chave == 'tiposangabogestante'){
+                    console.log("AQWI")
                     flag = 1;
                     let valor = body[chave];
-                    op+="tiposangabogestante="+valor+", ";
+                    op+="tiposangabogestante='"+valor+"', ";
                 }
                 else if (chave == 'fatorrhgestante'){
+                    console.log("AQWI")
                     flag = 1;
                     let valor = body[chave];
-                    op+="fatorrhgestante="+valor+", ";
+                    op+="fatorrhgestante='"+valor+"', ";
                 }
             }
             if(!flag){
@@ -115,6 +117,7 @@ function patchGestantes(req, res, next){
                     op = op.slice(-0,-2);
                 }
                 op += " WHERE codgestante=CAST(" + uid + " AS INTEGER)";
+                console.log(op)
                 db.any(op)
                 .then(function (data) {
                     res.status(200)
