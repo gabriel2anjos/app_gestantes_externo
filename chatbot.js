@@ -10,8 +10,8 @@ var assistant = new watson.AssistantV1(
 );
 
 assistant.message({
-    workspace_id: '6319e464-f009-460a-b509-5943243abc54',
-    input: {text: "Gostaria de ajuda para comprar um celular"}
+    workspace_id: 'e0144021-23b1-4d20-8fb0-95db345a77cc',
+    input: {text: "ola"}
 },  function(err, response) {
     if (err)
         console.log('error:', err);
