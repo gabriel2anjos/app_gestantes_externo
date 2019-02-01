@@ -102,11 +102,13 @@ function patchGestantes(req, res, next){
                     op+="rggestante='"+valor+"', ";
                 }
                 else if (chave == 'tiposangabogestante'){
+                    console.log("AQWI")
                     flag = 1;
                     let valor = body[chave];
                     op+="tiposangabogestante='"+valor+"', ";
                 }
                 else if (chave == 'fatorrhgestante'){
+                    console.log("AQWI")
                     flag = 1;
                     let valor = body[chave];
                     op+="fatorrhgestante='"+valor+"', ";
@@ -120,6 +122,7 @@ function patchGestantes(req, res, next){
                     op = op.slice(-0,-2);
                 }
                 op += " WHERE codgestante=CAST(" + uid + " AS INTEGER)";
+                console.log(op)
                 db.any(op)
                 .then(function (data) {
                     res.status(200)
