@@ -3,6 +3,7 @@ var router = express.Router();
 var cors = require('cors')
 var app = express();
 var bodyParser = require('body-parser')
+
 app.use(cors())
 app.use(bodyParser.urlencoded({
     extended: true
@@ -10,12 +11,16 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json())
 
 var db = require('./queries');
+var pass = require('./passwords');
 
 
 
 
 app.get('/', homePage);
+app.get('/ativacao/:uid?', db.getAtivarContaGestante);
 app.get('/gestante/:uid?', db.getAllGestantes).patch('/gestante/:uid', db.patchGestantes);
+app.post('/gestante/senha/:uid?', db.postSenhaGestante);
+app.post('/gestante/login/:uid?', db.postLoginGestante);
 app.get('/status-ass-verso/:uid?', db.getAllStatusAssVerso);
 app.get('/regiao-saude/:uid?', db.getAllRegiaoSaude);
 app.get('/cidade/:uid?', db.getAllCidade);
@@ -47,6 +52,7 @@ app.get('/exame-triagem/:uid?', db.getAllExameTriagem);
 app.get('*', function(req, res){
     res.send(404);
   });
+
 
 
 function homePage(req, res, next) {

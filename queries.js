@@ -1,7 +1,12 @@
 var promise = require('bluebird');
 var index = require('./constants');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+const path = require('path');
+
 
 noToken = true;
+confirmacaoEmail = false;
 
 var options = {
     // Initialization Options
@@ -79,32 +84,32 @@ function patchGestantes(req, res, next){
                 if (chave == 'celulargestante'){
                     flag = 1;
                     let valor = body[chave];
-                    op+="celulargestante="+valor+", ";
+                    op+="celulargestante='"+valor+"', ";
                 }
                 else if (chave == 'emailgestante'){
                     flag = 1;
                     let valor = body[chave];
-                    op+="emailgestante="+valor+", ";
+                    op+="emailgestante='"+valor+"', ";
                 }
                 else if (chave == 'telefonegestante'){
                     flag = 1;
                     let valor = body[chave];
-                    op+="telefonegestante="+valor+", ";
+                    op+="telefonegestante='"+valor+"', ";
                 }
                 else if (chave == 'rggestante'){
                     flag = 1;
                     let valor = body[chave];
-                    op+="rggestante="+valor+", ";
+                    op+="rggestante='"+valor+"', ";
                 }
                 else if (chave == 'tiposangabogestante'){
                     flag = 1;
                     let valor = body[chave];
-                    op+="tiposangabogestante="+valor+", ";
+                    op+="tiposangabogestante='"+valor+"', ";
                 }
                 else if (chave == 'fatorrhgestante'){
                     flag = 1;
                     let valor = body[chave];
-                    op+="fatorrhgestante="+valor+", ";
+                    op+="fatorrhgestante='"+valor+"', ";
                 }
             }
             if(!flag){
@@ -828,23 +833,11 @@ function getAllResultadoTexto(req, res, next) {
 
 function getAllObsReconvocacao(req, res, next) {
     if (req.headers['token'] == index.SECRET_KEY || noToken) {
-        let op = "SELECT * FROM obsreconvocacao ";
+        let op = "SELECT * FROM resultadotexto ";
         let query = req.query;
         let uid = req.params.uid;
         if (uid) {
-            op += " WHERE codobsreconvocacao=CAST(" + uid + " AS INTEGER)";
-        }
-        else if (query) {
-            op+="WHERE ";
-            if (query['codcoleta']) {
-                op +=" reconvocacao_codreconvocacao=CAST(" + query['codcoleta'] + " AS INTEGER) AND";
-            }
-            if (op.slice(-4)==' AND'){
-                op = op.slice(-0,-4);
-            }
-            if (op.slice(-6)=='WHERE '){
-                op = op.slice(-0,-6);
-            }
+            op += " WHERE codresultadotexto=CAST(" + uid + " AS INTEGER)";
         }
         db.any(op)
             .then(function (data) {
@@ -897,6 +890,117 @@ function getAllExameTriagem(req, res, next) {
     }
 }
 
+function postSenhaGestante(req, res, next){
+    if (req.headers['token'] == index.SECRET_KEY || noToken) {
+        let op = "UPDATE gestante SET ";
+        let body = req.body;
+        let senha = "";
+        let uid = req.params.uid;
+        let flag = 0;
+        if (uid) {
+            for (var chave in body){
+                if (chave == 'password'){
+                    flag = 1;
+                    senha = body[chave];
+                }
+            }
+            if(!flag){
+                return res.status(500).json({status:"Nenhum parametro passado"});
+            }
+            
+            else{
+                bcrypt.genSalt(saltRounds).then(function(salt, err_salt) {
+                    bcrypt.hash(senha, salt).then(function(hash, err_hash) {
+                        op+="senha_hash='"+hash+"', ";
+                        op+="senha_salt='"+salt+"'";
+                        op += " WHERE codgestante=CAST(" + uid + " AS INTEGER)";
+                        db.any(op)
+                        .then(function (data) {
+                            return res.status(200)
+                                .json({status:"Escrito"});
+                        })
+                        .catch(function (err) {
+                            console.log(err);
+                            return next(err);
+                        });
+                })
+            });
+            }
+        }
+    }
+    else {
+        invalidKey(res);
+    }
+}
+
+function postLoginGestante(req, res, next){
+    if (req.headers['token'] == index.SECRET_KEY || noToken) {
+        let body = req.body;
+        let uid = req.params.uid;
+        let flag = 0;
+        if (uid) {
+            db.any("SELECT * FROM gestante WHERE codgestante=CAST("+uid+" AS INTEGER)").then(function (data) {
+                if (data.length != 0) {
+                    // bcrypt.hash(body["password"], data[0]["senha_salt"], function(err, hash) {
+                    //     console.log(hash)
+                    //     console.log(data[0]["senha_hash"])
+                    // });
+                    if (data["email_ativo"] || !confirmacaoEmail){
+                        let gestante=data[0];
+                        bcrypt.compare(body["password"], gestante["senha_hash"]).then(function(ok) {
+                            if (ok){
+                                return res.status(200)
+                                    .json({ status : "Logado como "+ gestante["nomegestante"]} );
+                            }
+                            else {
+                                return res.status(400)
+                                .json({ status : "Senha invalida"} );
+                            }
+                        });
+                    }
+                    else {
+                        res.status(500)
+                        .json({ status : "Email nao ativado"} );
+                    }
+                }
+                else{
+                    return res.status(400)
+                    .json({ status : "ID invalido!"} );
+                }
+        });}
+        else {
+            res.status(400)
+            .json({ status : "Passe um ID"} );
+        }
+    }
+    else {
+        invalidKey(res);
+    }
+}
+
+
+function getAtivarContaGestante(req, res, next){
+    let uid = req.params.uid;
+    if (uid){
+        let op = "SELECT * FROM gestante WHERE cnsgestante='"+uid+"'";
+        db.any(op).then(function (data) {
+            if (data.length==1){
+                db.any("UPDATE gestante SET email_ativo=true WHERE cnsgestante='"+uid+"'").then(function (data) {
+                    return res.status(200)
+                .json({ status : "Email ativado!"} );});
+            }
+            else{
+                return res.status(500)
+                .json({ status : "Erro"} );
+            }
+        });
+    }
+    else {
+        return res.status(500)
+        .json({ status : "Passe um ID"} );
+    }
+}   
+
 
 module.exports = {
     getAllGestantes: getAllGestantes,
@@ -929,4 +1033,7 @@ module.exports = {
     getAllResultadoTexto: getAllResultadoTexto,
     getAllObsReconvocacao: getAllObsReconvocacao,
     getAllExameTriagem: getAllExameTriagem,
+    postSenhaGestante: postSenhaGestante,
+    postLoginGestante: postLoginGestante,   
+    getAtivarContaGestante: getAtivarContaGestante
 };
