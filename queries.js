@@ -912,23 +912,33 @@ function postSenhaGestante(req, res, next){
             }
             
             else{
-                bcrypt.genSalt(saltRounds).then(function(salt, err_salt) {
-                    bcrypt.hash(senha, salt).then(function(hash, err_hash) {
-                        op+="senha_hash='"+hash+"', ";
-                        op+="senha_salt='"+salt+"'";
-                        op += " WHERE codgestante=CAST(" + uid + " AS INTEGER)";
-                        db.any(op)
-                        .then(function (data) {
-                            return res.status(200)
-                                .json({status:"Escrito"});
+                db.any("SELECT * FROM gestante WHERE codgestante=CAST("+uid+" AS INTEGER)").then(function (data) {
+                    if (data["email_ativo"] != null && data["email_ativo"]!="") {
+                        bcrypt.genSalt(saltRounds).then(function(salt, err_salt) {
+                            bcrypt.hash(senha, salt).then(function(hash, err_hash) {
+                                let random = Math.random()*10000000000000000
+                                random = Math.round(random);
+                                op+="senha_hash='"+hash+"', ";
+                                op+="senha_salt='"+random+"'";
+                                op += " WHERE codgestante=CAST(" + uid + " AS INTEGER)";
+                                db.any(op)
+                                .then(function (data) {
+                                    return res.status(200)
+                                        .json({status:"Escrito"});
+                                })
+                                .catch(function (err) {
+                                    console.log(err);
+                                    return next(err);
+                                });
                         })
-                        .catch(function (err) {
-                            console.log(err);
-                            return next(err);
-                        });
-                })
-            });
+                    });
             }
+                else{
+                    return res.status(500)
+                    .json({status:"Precisa antes de um email!"});
+                }
+            });
+        }
         }
     }
     else {
@@ -985,10 +995,12 @@ function postLoginGestante(req, res, next){
 function getAtivarContaGestante(req, res, next){
     let uid = req.params.uid;
     if (uid){
-        let op = "SELECT * FROM gestante WHERE cnsgestante='"+uid+"'";
+        let op = "SELECT * FROM gestante WHERE senha_salt='"+uid+"'";
+        console.log(uid)
         db.any(op).then(function (data) {
+            console.log(data)
             if (data.length==1){
-                db.any("UPDATE gestante SET email_ativo=true WHERE cnsgestante='"+uid+"'").then(function (data) {
+                db.any("UPDATE gestante SET email_ativo=true WHERE senha_salt='"+uid+"'").then(function (data) {
                     return res.status(200)
                 .json({ status : "Email ativado!"} );});
             }

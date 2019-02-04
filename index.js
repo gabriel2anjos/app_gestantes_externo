@@ -12,7 +12,7 @@ app.use(bodyParser.json())
 
 var db = require('./queries');
 var pass = require('./passwords');
-
+var cb = require ('./chatbot')
 
 
 
@@ -49,6 +49,7 @@ app.get('/status-ref-mensal/:uid?', db.getAllStatusRefMensal);
 app.get('/resultado-texto/:uid?', db.getAllResultadoTexto);
 app.get('/obs-reconvocacao/:uid?', db.getAllObsReconvocacao);
 app.get('/exame-triagem/:uid?', db.getAllExameTriagem);
+app.post('/mensagem/', cb.postMensagem);
 app.get('*', function(req, res){
     res.send(404);
   });
