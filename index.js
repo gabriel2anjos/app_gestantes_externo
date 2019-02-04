@@ -17,10 +17,10 @@ var cb = require ('./chatbot')
 
 
 app.get('/', homePage);
-app.get('/ativacao/:uid?', db.getAtivarContaGestante);
+// app.get('/ativacao/:uid?', db.getAtivarContaGestante);
 app.get('/gestante/:uid?', db.getAllGestantes).patch('/gestante/:uid', db.patchGestantes);
-app.post('/gestante/senha/:uid?', db.postSenhaGestante);
-app.post('/gestante/login/:uid?', db.postLoginGestante);
+// app.post('/gestante/senha/:uid?', db.postSenhaGestante);
+// app.post('/gestante/login/:uid?', db.postLoginGestante);
 app.get('/status-ass-verso/:uid?', db.getAllStatusAssVerso);
 app.get('/regiao-saude/:uid?', db.getAllRegiaoSaude);
 app.get('/cidade/:uid?', db.getAllCidade);
