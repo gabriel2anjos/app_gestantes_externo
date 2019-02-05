@@ -50,6 +50,7 @@ app.get('/resultado-texto/:uid?', db.getAllResultadoTexto);
 app.get('/obs-reconvocacao/:uid?', db.getAllObsReconvocacao);
 app.get('/exame-triagem/:uid?', db.getAllExameTriagem);
 app.post('/mensagem/', cb.postMensagem);
+app.post('/mensagem/iniciar-sessao/', cb.postIniciarSessao);
 app.get('*', function(req, res){
     res.send(404);
   });
