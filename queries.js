@@ -1,6 +1,6 @@
 var promise = require('bluebird');
 var index = require('./constants');
-// const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const path = require('path');
 
@@ -1048,7 +1048,7 @@ module.exports = {
     getAllResultadoTexto: getAllResultadoTexto,
     getAllObsReconvocacao: getAllObsReconvocacao,
     getAllExameTriagem: getAllExameTriagem,
-    // postSenhaGestante: postSenhaGestante,
-    // postLoginGestante: postLoginGestante,   
-    // getAtivarContaGestante: getAtivarContaGestante
+    postSenhaGestante: postSenhaGestante,
+    postLoginGestante: postLoginGestante,   
+    getAtivarContaGestante: getAtivarContaGestante
 };
