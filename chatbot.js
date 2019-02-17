@@ -31,12 +31,9 @@ function postIniciarSessao(req, res) {
 }
 
 function postMensagem(req, res) {
+    req.body["assistant_id"]=assistantId;
     assistant.message(
-        {
-          input: { text: req.body.input.text },
-          assistant_id: assistantId,
-          session_id: req.body.session_id,
-        },
+        req.body,
         function(err, result) {
             console.log(req.body.input.text)
           if (err) {
@@ -44,6 +41,7 @@ function postMensagem(req, res) {
                 .json(err);
           } else {
             return res.status(200)
+                // .json(result);
                 .json(result);
           }
         }
