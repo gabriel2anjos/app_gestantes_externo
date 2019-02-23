@@ -37,5 +37,5 @@ function postFaqItem(req, res, next) {
 
 module.exports = {
   getAllFaqItems: getAllFaqItems,
-  postFaqItem: postFaqItem
+  postFaqItem: postFaqItem,
 }

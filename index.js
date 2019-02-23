@@ -3,7 +3,6 @@ var router = express.Router();
 var cors = require('cors')
 var app = express();
 var bodyParser = require('body-parser')
-
 var MongoClient = require('mongodb').MongoClient;
 var mongo_url = "mongodb://gestantes:NSWFpj17@207.38.86.52:29684/gestantes";
 
@@ -57,7 +56,7 @@ app.get('/exame-triagem/:uid?', dbe.getAllExameTriagem);
 app.post('/mensagem/', cb.postMensagem);
 app.post('/mensagem/iniciar-sessao/', cb.postIniciarSessao);
 //mongo
-app.get('/mongo/itens-faq/', dbm.getAllFaq);
+app.get('/mongo/itens-faq/', dbm.getAllFaqItems);
 app.post('/mongo/itens-faq/', dbm.postFaqItem);
 
 app.get('*', function(req, res){
