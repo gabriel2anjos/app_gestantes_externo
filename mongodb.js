@@ -1,3 +1,4 @@
+var index = require('./constants');
 function invalidKey(res) {
   res.status(401)
       .json({
