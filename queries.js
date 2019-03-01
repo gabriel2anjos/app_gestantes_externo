@@ -954,16 +954,22 @@ function postLoginGestante(req, res, next){
         if (uid) {
             db.any("SELECT * FROM gestante WHERE codgestante=CAST("+uid+" AS INTEGER)").then(function (data) {
                 if (data.length != 0) {
-                    // bcrypt.hash(body["password"], data[0]["senha_salt"], function(err, hash) {
-                    //     console.log(hash)
-                    //     console.log(data[0]["senha_hash"])
-                    // });
                     if (data["email_ativo"] || !confirmacaoEmail){
                         let gestante=data[0];
                         bcrypt.compare(body["password"], gestante["senha_hash"]).then(function(ok) {
                             if (ok){
-                                return res.status(200)
-                                    .json({ status : "Logado como "+ gestante["nomegestante"]} );
+                                if(body["fcm_token"]){
+                                    db.any("UPDATE gestante SET fcm_token='"+body["fcm_token"]+"' WHERE codgestante=CAST("+uid+" AS INTEGER)").then(function(b)
+                                    {
+                                        return res.status(200)
+                                            .json({ status : "Logado como "+ gestante["nomegestante"]+" com token FCM" +gestante["token_fcm"]} );
+                                    }
+                                    )
+                                }
+                                else{
+                                    return res.status(200)
+                                        .json({ status : "Logado como "+ gestante["nomegestante"]+" sem token FCM"} );
+                                }
                             }
                             else {
                                 return res.status(400)
