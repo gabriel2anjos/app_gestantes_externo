@@ -913,12 +913,13 @@ function postSenhaGestante(req, res, next){
             
             else{
                 db.any("SELECT * FROM gestante WHERE codgestante=CAST("+uid+" AS INTEGER)").then(function (data) {
-                    if (data["email_ativo"] != null && data["email_ativo"]!="") {
+                    if (data["emailgestante"]!="") {
                         bcrypt.genSalt(saltRounds).then(function(salt, err_salt) {
                             bcrypt.hash(senha, salt).then(function(hash, err_hash) {
                                 let random = Math.random()*10000000000000000
                                 random = Math.round(random);
                                 op+="senha_hash='"+hash+"', ";
+                                if (!confirmacaoEmail) op+="email_ativo=true, ";
                                 op+="senha_salt='"+random+"'";
                                 op += " WHERE codgestante=CAST(" + uid + " AS INTEGER)";
                                 db.any(op)
