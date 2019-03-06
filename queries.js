@@ -954,7 +954,12 @@ function postLoginGestante(req, res, next){
         let flag = 0;
         if (uid) {
             db.any("SELECT * FROM gestante WHERE codgestante=CAST("+uid+" AS INTEGER)").then(function (data) {
+                console.log(data[0]["senha_hash"])
                 if (data.length != 0) {
+                    if(data[0]["senha_hash"]==null){
+                        return res.status(501)
+                                        .json({ status : "Sem senha registrada"} );
+                    }
                     if (data["email_ativo"] || !confirmacaoEmail){
                         let gestante=data[0];
                         bcrypt.compare(body["password"], gestante["senha_hash"]).then(function(ok) {
