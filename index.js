@@ -7,7 +7,11 @@ var MongoClient = require('mongodb').MongoClient;
 var mongo_url = "mongodb://gestantes:NSWFpj17@207.38.86.52:29684/gestantes";
 
 
-app.use(cors())
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
 app.use(bodyParser.urlencoded({
     extended: true
 }))
