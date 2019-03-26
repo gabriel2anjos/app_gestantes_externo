@@ -952,16 +952,16 @@ function postLoginGestante(req, res, next){
         let body = req.body;
         let uid = req.params.uid;
         let flag = 0;
+        console.log("aaa")
         if (uid) {
             db.any("SELECT * FROM gestante WHERE codgestante=CAST("+uid+" AS INTEGER)").then(function (data) {
+
+        console.log("bbb")
                 console.log(data[0]["senha_hash"])
                 if (data.length != 0) {
-                    if(data[0]["senha_hash"]==null){
-                        return res.status(501)
-                                        .json({ status : "Sem senha registrada"} );
-                    }
-                    if (data["email_ativo"] || !confirmacaoEmail){
+                    if ((data["email_ativo"] || !confirmacaoEmail) && (data[0]["senha_hash"]!=null)){
                         let gestante=data[0];
+                        console.log(gestante["senha_hash"])
                         bcrypt.compare(body["password"], gestante["senha_hash"]).then(function(ok) {
                             if (ok){
                                 if(body["fcm_token"]){

@@ -7,11 +7,7 @@ var MongoClient = require('mongodb').MongoClient;
 var mongo_url = "mongodb://gestantes:NSWFpj17@207.38.86.52:29684/gestantes";
 
 
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-  });
+app.use(cors())
 app.use(bodyParser.urlencoded({
     extended: true
 }))
@@ -25,6 +21,7 @@ var dbm = require('./mongodb')
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, PATCH, DELETE, OPTIONS');
     next();
   });
 
@@ -65,8 +62,8 @@ app.post('/mensagem/', cb.postMensagem);
 app.post('/mensagem/iniciar-sessao/', cb.postIniciarSessao);
 //mongo
 app.get('/mongo/itens-faq/', dbm.getAllFaqItems);
-app.post('/mongo/itens-faq/', dbm.postFaqItem);
-
+app.post('/mongo/dia-calendario', dbm.postDiaCalendario);
+app.get('/mongo/dia-calendario/:uid?', dbm.getDiaCalendario).patch('/mongo/dia-calendario/:uid', dbm.patchDiaCalendario);
 app.get('*', function(req, res){
     res.send(404);
   });
