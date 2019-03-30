@@ -2,9 +2,8 @@ var promise = require('bluebird');
 var index = require('./constants');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const path = require('path');
-
-
+const nodemailer = require('nodemailer');
+const url_recuperar = "www.appgestantes.polijunior.com.br/api/externo/esqueci-minha-senha/"
 noToken = true;
 confirmacaoEmail = false;
 
@@ -31,6 +30,20 @@ const cn = {
     password: 'R@g761206'
 };
 var db = pgp(cn);
+
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+        user: 'appgestantes@polijunior.com.br',
+        pass: 'appGestantes2019#'
+    }
+});
+
+
+
+
 
 // add query functions
 
@@ -1004,21 +1017,66 @@ function postLoginGestante(req, res, next){
 }
 
 
-function getAtivarContaGestante(req, res, next){
+function getRecuperarSenhaGestante(req, res, next){
     let uid = req.params.uid;
     if (uid){
         let op = "SELECT * FROM gestante WHERE senha_salt='"+uid+"'";
-        console.log(uid)
         db.any(op).then(function (data) {
-            console.log(data)
             if (data.length==1){
-                db.any("UPDATE gestante SET email_ativo=true WHERE senha_salt='"+uid+"'").then(function (data) {
+                db.any("UPDATE gestante SET senha_hash='' WHERE senha_salt='"+uid+"'").then(function (data) {
                     return res.status(200)
-                .json({ status : "Email ativado!"} );});
+                .json({ status : "Senha reiniciada! Acesse o app para mudar."} );});
             }
             else{
                 return res.status(500)
                 .json({ status : "Erro"} );
+            }
+        });
+    }
+    else {
+        return res.status(500)
+        .json({ status : "Passe um ID"} );
+    }
+}   
+
+
+function getAtivarRecuperacaoSenhaGestante(req, res, next){
+    let uid = req.params.uid;
+    if (uid){
+        let op = "SELECT * FROM gestante WHERE codgestante=CAST("+uid+" AS INTEGER)";
+        db.any(op).then(function (data) {
+            if (!data[0].emailgestante || data[0].emailgestante==""){
+                return res.status(500)
+                .json({ status : "Gestante sem email"} );
+            }
+            else{
+                let random = Math.round((Math.random()*1000000000000)).toString()+Math.round((Math.random()*10000000000)).toString()+Math.round((Math.random()*10000000000)).toString();
+                let op = "UPDATE gestante SET senha_salt='"+random+"' WHERE codgestante=CAST(" + uid + " AS INTEGER)";
+                db.any(op)
+                .then(function (dataup) {
+                    var mailOptions = {
+                        from: "Aplicativo Teste da Mamãe",
+                        to: data[0].emailgestante,
+                        subject: 'Foi você que esqueceu sua senha?',
+                        text: 'Olá!',
+                        html: "Olá! Para recuperar sua senha do App, acesse "+url_recuperar+random+" ,e então entre no App para escolher uma nova senha.",
+                    };
+         
+                    transporter.sendMail(mailOptions, (err) => {
+
+                        if (err) {
+                            return res.status(500)
+                            .json({ "status" : "Erro ao enviar email!"} );
+                        } else {
+                            return res.status(200)
+                            .json({ "status" : "Email enviado!"} );
+                        }
+
+                    });
+                }).catch(function (err) {
+                    return res.status(500)
+                        .json({ status : "Erro ao encontrar gestante!"} );
+                });
             }
         });
     }
@@ -1062,5 +1120,6 @@ module.exports = {
     getAllExameTriagem: getAllExameTriagem,
     postSenhaGestante: postSenhaGestante,
     postLoginGestante: postLoginGestante,   
-    getAtivarContaGestante: getAtivarContaGestante
+    getRecuperarSenhaGestante: getRecuperarSenhaGestante,
+    getAtivarRecuperacaoSenhaGestante : getAtivarRecuperacaoSenhaGestante,
 };

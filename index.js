@@ -26,11 +26,12 @@ app.use(function(req, res, next) {
   });
 
 app.get('/', homePage);
-app.get('/ativacao/:uid?', dbe.getAtivarContaGestante);
 app.get('/gestante/:uid?', dbe.getAllGestantes)
 .patch('/gestante/:uid', dbe.patchGestantes);
 app.post('/gestante/senha/:uid?', dbe.postSenhaGestante);
 app.post('/gestante/login/:uid?', dbe.postLoginGestante);
+app.get('/esqueci-minha-senha/:uid', dbe.getRecuperarSenhaGestante);
+app.get('/gestante/ativar-recuperar-senha/:uid', dbe.getAtivarRecuperacaoSenhaGestante);
 app.get('/status-ass-verso/:uid?', dbe.getAllStatusAssVerso);
 app.get('/regiao-saude/:uid?', dbe.getAllRegiaoSaude);
 app.get('/cidade/:uid?', dbe.getAllCidade);
