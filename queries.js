@@ -3,7 +3,7 @@ var index = require('./constants');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const nodemailer = require('nodemailer');
-const url_recuperar = "www.appgestantes.polijunior.com.br/api/externo/esqueci-minha-senha/"
+const url_recuperar = "appgestantes.polijr.com.br/api/externo/esqueci-minha-senha/"
 noToken = true;
 confirmacaoEmail = false;
 
