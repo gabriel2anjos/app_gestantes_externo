@@ -969,19 +969,16 @@ function postLoginGestante(req, res, next){
         if (uid) {
             db.any("SELECT * FROM gestante WHERE codgestante=CAST("+uid+" AS INTEGER)").then(function (data) {
 
-        console.log("bbb")
-                console.log(data[0]["senha_hash"])
                 if (data.length != 0) {
                     if ((data["email_ativo"] || !confirmacaoEmail) && (data[0]["senha_hash"]!=null)){
                         let gestante=data[0];
-                        console.log(gestante["senha_hash"])
                         bcrypt.compare(body["password"], gestante["senha_hash"]).then(function(ok) {
                             if (ok){
                                 if(body["fcm_token"]){
                                     db.any("UPDATE gestante SET fcm_token='"+body["fcm_token"]+"' WHERE codgestante=CAST("+uid+" AS INTEGER)").then(function(b)
                                     {
                                         return res.status(200)
-                                            .json({ status : "Logado como "+ gestante["nomegestante"]+" com token FCM" +gestante["token_fcm"]} );
+                                            .json({ status : "Logado como "+ gestante["nomegestante"]+" com token FCM " +body["fcm_token"]} );
                                     }
                                     )
                                 }
@@ -1023,7 +1020,7 @@ function getRecuperarSenhaGestante(req, res, next){
         let op = "SELECT * FROM gestante WHERE senha_salt='"+uid+"'";
         db.any(op).then(function (data) {
             if (data.length==1){
-                db.any("UPDATE gestante SET senha_hash='' WHERE senha_salt='"+uid+"'").then(function (data) {
+                db.any("UPDATE gestante SET senha_hash='', email_ativo=false WHERE senha_salt='"+uid+"'").then(function (data) {
                     return res.status(200)
                 .json({ status : "Senha reiniciada! Acesse o app para mudar."} );});
             }
