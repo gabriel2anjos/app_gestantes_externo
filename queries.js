@@ -968,9 +968,6 @@ function postLoginGestante(req, res, next){
         console.log("aaa")
         if (uid) {
             db.any("SELECT * FROM gestante WHERE codgestante=CAST("+uid+" AS INTEGER)").then(function (data) {
-
-        console.log("bbb")
-                console.log(data[0]["senha_hash"])
                 if (data.length != 0) {
                     if ((data["email_ativo"] || !confirmacaoEmail) && (data[0]["senha_hash"]!=null)){
                         let gestante=data[0];
@@ -1086,6 +1083,172 @@ function getAtivarRecuperacaoSenhaGestante(req, res, next){
     }
 }   
 
+function postSenhaOrigem(req, res, next){
+    if (req.headers['token'] == index.SECRET_KEY || noToken) {
+        let op = "UPDATE origem SET ";
+        let body = req.body;
+        let senha = "";
+        let uid = req.params.uid;
+        let flag = 0;
+        if (uid) {
+            for (var chave in body){
+                if (chave == 'password'){
+                    flag = 1;
+                    senha = body[chave];
+                }
+            }
+            if(!flag){
+                return res.status(500).json({status:"Nenhum parametro passado"});
+            }
+            
+            else{
+                db.any("SELECT * FROM origem WHERE codorigem=CAST("+uid+" AS INTEGER)").then(function (data) {
+                    if (data["emailorigem"]!="") {
+                        bcrypt.genSalt(saltRounds).then(function(salt, err_salt) {
+                            bcrypt.hash(senha, salt).then(function(hash, err_hash) {
+                                let random = Math.random()*10000000000000000
+                                random = Math.round(random);
+                                op+="senha_hash='"+hash+"', ";
+                                if (!confirmacaoEmail) op+="email_ativo=true, ";
+                                op+="senha_salt='"+random+"'";
+                                op += " WHERE codorigem=CAST(" + uid + " AS INTEGER)";
+                                db.any(op)
+                                .then(function (data) {
+                                    return res.status(200)
+                                        .json({status:"Escrito"});
+                                })
+                                .catch(function (err) {
+                                    console.log(err);
+                                    return next(err);
+                                });
+                        })
+                    });
+            }
+                else{
+                    return res.status(500)
+                    .json({status:"Precisa antes de um email!"});
+                }
+            });
+        }
+        }
+    }
+    else {
+        invalidKey(res);
+    }
+}
+
+function postLoginOrigem(req, res, next){
+    if (req.headers['token'] == index.SECRET_KEY || noToken) {
+        let body = req.body;
+        let uid = req.params.uid;
+        let flag = 0;
+        console.log("aaa")
+        if (uid) {
+            db.any("SELECT * FROM origem WHERE codorigem=CAST("+uid+" AS INTEGER)").then(function (data) {
+                if (data.length != 0) {
+                    if ((data["email_ativo"] || !confirmacaoEmail) && (data[0]["senha_hash"]!=null)){
+                        let origem=data[0];
+                        bcrypt.compare(body["password"], origem["senha_hash"]).then(function(ok) {
+                            if (ok){
+                                    return res.status(200)
+                                        .json({ status : "Logado como posto "+ origem["nomeorigem"]} );
+                            }
+                            else {
+                                return res.status(400)
+                                .json({ status : "Senha invalida"} );
+                            }
+                        });
+                    }
+                    else {
+                        res.status(500)
+                        .json({ status : "Email nao ativado"} );
+                    }
+                }
+                else{
+                    return res.status(400)
+                    .json({ status : "ID invalido!"} );
+                }
+        });}
+        else {
+            res.status(400)
+            .json({ status : "Passe um ID"} );
+        }
+    }
+    else {
+        invalidKey(res);
+    }
+}
+
+
+function getRecuperarSenhaOrigem(req, res, next){
+    let uid = req.params.uid;
+    if (uid){
+        let op = "SELECT * FROM origem WHERE senha_recover='"+uid+"'";
+        db.any(op).then(function (data) {
+            if (data.length==1){
+                db.any("UPDATE origem SET senha_hash='' WHERE senha_recover='"+uid+"'").then(function (data) {
+                    return res.status(200)
+                .json({ status : "Senha reiniciada! Acesse o app para mudar."} );});
+            }
+            else{
+                return res.status(500)
+                .json({ status : "Erro"} );
+            }
+        });
+    }
+    else {
+        return res.status(500)
+        .json({ status : "Passe um ID"} );
+    }
+}   
+
+
+function getAtivarRecuperacaoSenhaOrigem(req, res, next){
+    let uid = req.params.uid;
+    if (uid){
+        let op = "SELECT * FROM origem WHERE codorigem=CAST("+uid+" AS INTEGER)";
+        db.any(op).then(function (data) {
+            if (!data[0].emailorigem || data[0].emailorigem==""){
+                return res.status(500)
+                .json({ status : "Posto sem email"} );
+            }
+            else{
+                let random = Math.round((Math.random()*1000000000000)).toString()+Math.round((Math.random()*10000000000)).toString()+Math.round((Math.random()*10000000000)).toString();
+                let op = "UPDATE origem SET senha_recover='"+random+"' WHERE codorigem=CAST(" + uid + " AS INTEGER)";
+                db.any(op)
+                .then(function (dataup) {
+                    var mailOptions = {
+                        from: "Aplicativo Teste da Mamãe",
+                        to: data[0].emailorigem,
+                        subject: 'Foi você que esqueceu sua senha?',
+                        text: 'Olá!',
+                        html: "Olá! Para recuperar sua senha do App, acesse "+url_recuperar+random+" ,e então entre no App para escolher uma nova senha.",
+                    };
+         
+                    transporter.sendMail(mailOptions, (err) => {
+
+                        if (err) {
+                            return res.status(500)
+                            .json({ "status" : "Erro ao enviar email!"} );
+                        } else {
+                            return res.status(200)
+                            .json({ "status" : "Email enviado!"} );
+                        }
+
+                    });
+                }).catch(function (err) {
+                    return res.status(500)
+                        .json({ status : "Erro ao encontrar posto!"} );
+                });
+            }
+        });
+    }
+    else {
+        return res.status(500)
+        .json({ status : "Passe um ID"} );
+    }
+}   
+
 
 module.exports = {
     getAllGestantes: getAllGestantes,
@@ -1122,4 +1285,8 @@ module.exports = {
     postLoginGestante: postLoginGestante,   
     getRecuperarSenhaGestante: getRecuperarSenhaGestante,
     getAtivarRecuperacaoSenhaGestante : getAtivarRecuperacaoSenhaGestante,
+    postSenhaOrigem: postSenhaOrigem,
+    postLoginOrigem: postLoginOrigem,   
+    getRecuperarSenhaOrigem: getRecuperarSenhaOrigem,
+    getAtivarRecuperacaoSenhaOrigem : getAtivarRecuperacaoSenhaOrigem,
 };
