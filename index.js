@@ -40,7 +40,12 @@ app.get('/distrito/:uid?', dbe.getAllDistrito);
 app.get('/tipo-coleta/:uid?', dbe.getAllTipoColeta);
 app.get('/status-coleta/:uid?', dbe.getAllStatusColeta);
 app.get('/tipo-origem/:uid?', dbe.getAllTipoOrigem);
-app.get('/origem/:uid?', dbe.getAllOrigem);
+app.get('/origem/:uid?', dbe.getAllOrigem)
+.patch('/origem/:uid', dbe.patchOrigem);
+app.post('/senha/origem/:uid?', dbe.postSenhaOrigem);
+app.post('/login/origem/:uid?', dbe.postLoginOrigem);
+app.get('/esqueci-minha-senha/origem/:uid', dbe.getRecuperarSenhaOrigem);
+app.get('/ativar-recuperar-senha/origem/:uid', dbe.getAtivarRecuperacaoSenhaOrigem);
 app.get('/coleta/:uid?', dbe.getAllColeta);
 app.get('/status-reconvocacao/:uid?', dbe.getAllStatusReconvocacao);
 app.get('/motivo-reconvocacao/:uid?', dbe.getAllMotivoReconvocacao);
