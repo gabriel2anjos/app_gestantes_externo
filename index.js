@@ -31,7 +31,7 @@ app.get('/gestante/:uid?', dbe.getAllGestantes)
 app.post('/gestante/senha/:uid?', dbe.postSenhaGestante);
 app.post('/gestante/login/:uid?', dbe.postLoginGestante);
 app.get('/esqueci-minha-senha/:uid', dbe.getRecuperarSenhaGestante);
-app.get('/gestante/ativar-recuperar-senha/:uid', dbe.getAtivarRecuperacaoSenhaGestante);
+app.get('/ativar-recuperar-senha/gestante/:uid', dbe.getAtivarRecuperacaoSenhaGestante);
 app.get('/status-ass-verso/:uid?', dbe.getAllStatusAssVerso);
 app.get('/regiao-saude/:uid?', dbe.getAllRegiaoSaude);
 app.get('/cidade/:uid?', dbe.getAllCidade);
@@ -43,8 +43,8 @@ app.get('/tipo-origem/:uid?', dbe.getAllTipoOrigem);
 app.get('/origem/:uid?', dbe.getAllOrigem);
 app.post('/origem/senha/:uid?', dbe.postSenhaOrigem);
 app.post('/origem/login/:uid?', dbe.postLoginOrigem);
-app.get('/esqueci-minha-senha/:uid', dbe.getRecuperarSenhaOrigem);
-app.get('/origem/ativar-recuperar-senha/:uid', dbe.getAtivarRecuperacaoSenhaOrigem);
+app.get('/esqueci-minha-senha/origem/:uid', dbe.getRecuperarSenhaOrigem);
+app.get('/ativar-recuperar-senha/origem/:uid', dbe.getAtivarRecuperacaoSenhaOrigem);
 app.get('/coleta/:uid?', dbe.getAllColeta);
 app.get('/status-reconvocacao/:uid?', dbe.getAllStatusReconvocacao);
 app.get('/motivo-reconvocacao/:uid?', dbe.getAllMotivoReconvocacao);
@@ -82,6 +82,7 @@ app.get('*', function(req, res){
 app.get('*', function(req, res){
     res.send(404);
   });
+
 
 
 
