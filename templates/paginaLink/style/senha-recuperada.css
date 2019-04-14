@@ -1,0 +1,83 @@
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+button,
+input {
+    font-family: "Segoe UI",Arial,sans-serif;
+}
+
+h1 {
+    font-size: 1.5ch;
+    font-weight: bold;
+    color: #14171a;
+}
+
+footer {
+    font-size: 0.8ch;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    background: #E6ECF0
+}
+
+b {
+    color: #80bfd7;
+}
+
+.content {
+    margin-top: 1ch;
+    display: flex;
+    justify-content: space-around;
+}
+
+.boxes {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+
+.content-box {
+    background: #FFF;
+    border-radius: 2em 2em 0 0;
+    border-top: 1px solid #80bfd7;
+    border-left: 1px solid #80bfd7;
+    border-right: 1px solid #80bfd7;
+    margin-bottom: 0;
+    padding-right: 3em;
+    padding-left: 3em;
+}
+
+.post-content-box {
+    background-color: #F5F8FA;
+    border-radius: 0 0 2em 2em;
+    border-bottom: 1px solid #80bfd7;
+    border-left: 1px solid #80bfd7;
+    border-right: 1px solid #80bfd7;
+    margin-top: 0;
+    padding-left: 3em;
+    padding-right: 3em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    color: rgb(163, 174, 182);
+    font-size: 0.7ch;
+}
+
+.image {
+    width: 40%;
+    height: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 3rem;
+}
+
+.title {
+    padding-top: 1.2em;
+    padding-bottom: 1em;
+}

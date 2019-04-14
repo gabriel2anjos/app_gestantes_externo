@@ -4,6 +4,10 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const nodemailer = require('nodemailer');
 const url_recuperar = "appgestantes.polijr.com.br/api/externo/esqueci-minha-senha/"
+const notif =  require('./notifications');
+const path = require('path');
+
+
 noToken = true;
 confirmacaoEmail = false;
 
@@ -40,6 +44,7 @@ const transporter = nodemailer.createTransport({
         pass: 'appGestantes2019#'
     }
 });
+
 
 
 
@@ -1020,9 +1025,10 @@ function getRecuperarSenhaGestante(req, res, next){
         let op = "SELECT * FROM gestante WHERE senha_salt='"+uid+"'";
         db.any(op).then(function (data) {
             if (data.length==1){
-                db.any("UPDATE gestante SET senha_hash='', email_ativo=false WHERE senha_salt='"+uid+"'").then(function (data) {
-                    return res.status(200)
-                .json({ status : "Senha reiniciada! Acesse o app para mudar."} );});
+
+                db.any("UPDATE gestante SET senha_hash='' WHERE senha_salt='"+uid+"'").then(function (data) {
+                    return res.sendfile(path.resolve(__dirname, './templates/paginaLink/senha-recuperada.html'));
+            });
             }
             else{
                 return res.status(500)
@@ -1056,12 +1062,13 @@ function getAtivarRecuperacaoSenhaGestante(req, res, next){
                         to: data[0].emailgestante,
                         subject: 'Foi você que esqueceu sua senha?',
                         text: 'Olá!',
-                        html: "Olá! Para recuperar sua senha do App, acesse "+url_recuperar+random+" ,e então entre no App para escolher uma nova senha.",
+                        template: 'email-template',
                     };
-         
+
                     transporter.sendMail(mailOptions, (err) => {
 
                         if (err) {
+                            console.log(err)
                             return res.status(500)
                             .json({ "status" : "Erro ao enviar email!"} );
                         } else {
@@ -1071,6 +1078,7 @@ function getAtivarRecuperacaoSenhaGestante(req, res, next){
 
                     });
                 }).catch(function (err) {
+                    console.log(err)
                     return res.status(500)
                         .json({ status : "Erro ao encontrar gestante!"} );
                 });
@@ -1187,9 +1195,8 @@ function getRecuperarSenhaOrigem(req, res, next){
         db.any(op).then(function (data) {
             if (data.length==1){
                 db.any("UPDATE origem SET senha_hash='' WHERE senha_recover='"+uid+"'").then(function (data) {
-                    return res.status(200)
-                .json({ status : "Senha reiniciada! Acesse o app para mudar."} );});
-            }
+                    return res.sendFile('./templaces/paginaLink/senha-recuperada.html');
+            });}
             else{
                 return res.status(500)
                 .json({ status : "Erro"} );
@@ -1223,7 +1230,7 @@ function getAtivarRecuperacaoSenhaOrigem(req, res, next){
                         to: data[0].emailorigem,
                         subject: 'Foi você que esqueceu sua senha?',
                         text: 'Olá!',
-                        html: "Olá! Para recuperar sua senha do App, acesse "+url_recuperar+random+" ,e então entre no App para escolher uma nova senha.",
+                        html:"Para recuperar sua senha acesse o link appgestantes.polijr.com.br/api/externo/esqueci-minha-senha/"+random,
                     };
          
                     transporter.sendMail(mailOptions, (err) => {
@@ -1290,6 +1297,22 @@ function patchOrigem(req, res, next){
     }
 }
 
+
+function notificationsService(req, res, next){
+    db.any("SELECT * FROM notificacoesapp").then(function (notificacoes) {
+    notificacoes.forEach((notificacao)=>{
+        db.any("SELECT * FROM gestante WHERE codgestante=CAST("+notificacao.codgestante_gestante+" AS INTEGER)").then(function (gestante) {
+        db.any("SELECT * FROM coleta WHERE codcoleta=CAST("+notificacao.codcoleta_coleta+" AS INTEGER)").then(function (coleta) {
+        console.log(gestante[0])
+        notif.sendNotification(notificacao, gestante[0], coleta[0]);
+        db.any("DELETE FROM notificacoesapp WHERE id=CAST("+notificacao.id+" AS INTEGER)");
+        });
+        });
+    });
+});
+}   
+
+setInterval(notificationsService, 120000); 
 
 module.exports = {
     getAllGestantes: getAllGestantes,
