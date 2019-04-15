@@ -78,6 +78,10 @@ function getAllGestantes(req, res, next) {
         }
         db.any(op)
             .then(function (data) {
+                data.forEach((e)=>{
+                    delete e.senha_hash;
+                    delete e.senha_salt;
+                });
                 res.status(200)
                     .json(data);
             })
@@ -368,7 +372,10 @@ function getAllStatusColeta(req, res, next) {
                 return next(err);
             });
     }
-    else {
+    else {data.forEach((e)=>{
+        delete e.senha_hash;
+        delete e.senha_salt;
+    });
         invalidKey(res);
     }
 }
@@ -406,6 +413,10 @@ function getAllOrigem(req, res, next) {
         }
         db.any(op)
             .then(function (data) {
+                data.forEach((e)=>{
+                    delete e.senha_hash;
+                    delete e.senha_recover;
+                });
                 res.status(200)
                     .json(data);
             })
