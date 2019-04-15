@@ -28,8 +28,8 @@ app.use(function(req, res, next) {
 app.get('/', homePage);
 app.get('/gestante/:uid?', dbe.getAllGestantes)
 .patch('/gestante/:uid', dbe.patchGestantes);
-app.post('/gestante/senha/:uid?', dbe.postSenhaGestante);
-app.post('/gestante/login/:uid?', dbe.postLoginGestante);
+app.post('/senha/gestante/:uid?', dbe.postSenhaGestante);
+app.post('/login/gestante/:uid?', dbe.postLoginGestante);
 app.get('/esqueci-minha-senha/:uid', dbe.getRecuperarSenhaGestante);
 app.get('/ativar-recuperar-senha/gestante/:uid', dbe.getAtivarRecuperacaoSenhaGestante);
 app.get('/status-ass-verso/:uid?', dbe.getAllStatusAssVerso);
@@ -40,9 +40,10 @@ app.get('/distrito/:uid?', dbe.getAllDistrito);
 app.get('/tipo-coleta/:uid?', dbe.getAllTipoColeta);
 app.get('/status-coleta/:uid?', dbe.getAllStatusColeta);
 app.get('/tipo-origem/:uid?', dbe.getAllTipoOrigem);
-app.get('/origem/:uid?', dbe.getAllOrigem);
-app.post('/origem/senha/:uid?', dbe.postSenhaOrigem);
-app.post('/origem/login/:uid?', dbe.postLoginOrigem);
+app.get('/origem/:uid?', dbe.getAllOrigem)
+.patch('/origem/:uid', dbe.patchOrigem);
+app.post('/senha/origem/:uid?', dbe.postSenhaOrigem);
+app.post('/login/origem/:uid?', dbe.postLoginOrigem);
 app.get('/esqueci-minha-senha/origem/:uid', dbe.getRecuperarSenhaOrigem);
 app.get('/ativar-recuperar-senha/origem/:uid', dbe.getAtivarRecuperacaoSenhaOrigem);
 app.get('/coleta/:uid?', dbe.getAllColeta);

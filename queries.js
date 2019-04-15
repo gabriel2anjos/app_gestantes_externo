@@ -984,17 +984,17 @@ function postLoginGestante(req, res, next){
         console.log("aaa")
         if (uid) {
             db.any("SELECT * FROM gestante WHERE codgestante=CAST("+uid+" AS INTEGER)").then(function (data) {
+
                 if (data.length != 0) {
                     if ((data["email_ativo"] || !confirmacaoEmail) && (data[0]["senha_hash"]!=null)){
                         let gestante=data[0];
-                        console.log(gestante["senha_hash"])
                         bcrypt.compare(body["password"], gestante["senha_hash"]).then(function(ok) {
                             if (ok){
                                 if(body["fcm_token"]){
                                     db.any("UPDATE gestante SET fcm_token='"+body["fcm_token"]+"' WHERE codgestante=CAST("+uid+" AS INTEGER)").then(function(b)
                                     {
                                         return res.status(200)
-                                            .json({ status : "Logado como "+ gestante["nomegestante"]+" com token FCM" +gestante["token_fcm"]} );
+                                            .json({ status : "Logado como "+ gestante["nomegestante"]+" com token FCM " +body["fcm_token"]} );
                                     }
                                     )
                                 }
@@ -1036,6 +1036,7 @@ function getRecuperarSenhaGestante(req, res, next){
         let op = "SELECT * FROM gestante WHERE senha_salt='"+uid+"'";
         db.any(op).then(function (data) {
             if (data.length==1){
+
                 db.any("UPDATE gestante SET senha_hash='' WHERE senha_salt='"+uid+"'").then(function (data) {
                     return res.sendfile(path.resolve(__dirname, './templates/paginaLink/senha-recuperada.html'));
             });
@@ -1121,14 +1122,14 @@ function postSenhaOrigem(req, res, next){
             
             else{
                 db.any("SELECT * FROM origem WHERE codorigem=CAST("+uid+" AS INTEGER)").then(function (data) {
-                    if (data["emailorigem"]!="") {
+                    if (data["emailorigem"]!="" && data["emailorigem"]!="-") {
                         bcrypt.genSalt(saltRounds).then(function(salt, err_salt) {
                             bcrypt.hash(senha, salt).then(function(hash, err_hash) {
                                 let random = Math.random()*10000000000000000
                                 random = Math.round(random);
                                 op+="senha_hash='"+hash+"', ";
                                 if (!confirmacaoEmail) op+="email_ativo=true, ";
-                                op+="senha_salt='"+random+"'";
+                                op+="senha_recover='"+random+"'";
                                 op += " WHERE codorigem=CAST(" + uid + " AS INTEGER)";
                                 db.any(op)
                                 .then(function (data) {
@@ -1234,6 +1235,7 @@ function getAtivarRecuperacaoSenhaOrigem(req, res, next){
                 let op = "UPDATE origem SET senha_recover='"+random+"' WHERE codorigem=CAST(" + uid + " AS INTEGER)";
                 db.any(op)
                 .then(function (dataup) {
+                    console.log(data[0].emailorigem)
                     var mailOptions = {
                         from: "Aplicativo Teste da Mamãe",
                         to: data[0].emailorigem,
@@ -1266,6 +1268,46 @@ function getAtivarRecuperacaoSenhaOrigem(req, res, next){
     }
 }   
 
+function patchOrigem(req, res, next){
+    if (req.headers['token'] == index.SECRET_KEY || noToken) {
+        let op = "UPDATE origem SET ";
+        let body = req.body;
+        let uid = req.params.uid;
+        let flag = 0;
+        if (uid) {
+            for (var chave in body){
+                if (chave == 'emailorigem'){
+                    flag = 1;
+                    let valor = body[chave];
+                    op+="emailorigem='"+valor+"', ";
+                }
+            }
+            if(!flag){
+                return res.status(500).json({status:"Nenhum parametro passado"});
+            }
+            else{
+                if (op.slice(-2)==', '){
+                    op = op.slice(-0,-2);
+                }
+                op += " WHERE codorigem=CAST(" + uid + " AS INTEGER)";
+                console.log(op)
+                db.any(op)
+                .then(function (data) {
+                    res.status(200)
+                        .json({status:"Escrito"});
+                })
+                .catch(function (err) {
+                    console.log(err);
+                    return next(err);
+                });
+            }
+        }
+    }
+    else {
+        invalidKey(res);
+    }
+}
+
 
 function notificationsService(req, res, next){
     db.any("SELECT * FROM notificacoesapp").then(function (notificacoes) {
@@ -1281,7 +1323,7 @@ function notificationsService(req, res, next){
 });
 }   
 
-setInterval(notificationsService, 10000); 
+setInterval(notificationsService, 120000); 
 
 module.exports = {
     getAllGestantes: getAllGestantes,
@@ -1322,4 +1364,5 @@ module.exports = {
     postLoginOrigem: postLoginOrigem,   
     getRecuperarSenhaOrigem: getRecuperarSenhaOrigem,
     getAtivarRecuperacaoSenhaOrigem : getAtivarRecuperacaoSenhaOrigem,
+    patchOrigem : patchOrigem
 };
