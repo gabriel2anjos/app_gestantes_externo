@@ -1073,7 +1073,7 @@ function getAtivarRecuperacaoSenhaGestante(req, res, next){
                         to: data[0].emailgestante,
                         subject: 'Foi você que esqueceu sua senha?',
                         text: 'Olá!',
-                        template: 'email-template',
+                        html:"Para recuperar sua senha acesse o link appgestantes.polijr.com.br/api/externo/esqueci-minha-senha/"+random,
                     };
 
                     transporter.sendMail(mailOptions, (err) => {
