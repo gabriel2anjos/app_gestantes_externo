@@ -7,6 +7,7 @@ const url_recuperar = "appgestantes.polijr.com.br/api/externo/esqueci-minha-senh
 const notif =  require('./notifications');
 const path = require('path');
 
+let senhaFixaPosto = "aNg_8(EdoW6gpsircd@C";
 
 noToken = true;
 confirmacaoEmail = false;
@@ -981,7 +982,6 @@ function postLoginGestante(req, res, next){
         let body = req.body;
         let uid = req.params.uid;
         let flag = 0;
-        console.log("aaa")
         if (uid) {
             db.any("SELECT * FROM gestante WHERE codgestante=CAST("+uid+" AS INTEGER)").then(function (data) {
 
@@ -1161,7 +1161,6 @@ function postLoginOrigem(req, res, next){
         let body = req.body;
         let uid = req.params.uid;
         let flag = 0;
-        console.log("aaa")
         if (uid) {
             db.any("SELECT * FROM origem WHERE codorigem=CAST("+uid+" AS INTEGER)").then(function (data) {
                 if (data.length != 0) {
@@ -1177,6 +1176,18 @@ function postLoginOrigem(req, res, next){
                                 .json({ status : "Senha invalida"} );
                             }
                         });
+                    }
+                    else if (data[0]["senha_hash"]==null && (!data["email_ativo"] || !confirmacaoEmail) ){
+                        let origem=data[0];
+                        if (body["password"]==senhaFixaPosto) {
+                                    return res.status(200)
+                                        .json({ status : "Logado como posto "+ origem["nomeorigem"]} );
+                            }
+                            else {
+                                return res.status(400)
+                                .json({ status : "Senha invalida"} );
+                            }
+                        
                     }
                     else {
                         res.status(500)
