@@ -7,7 +7,7 @@ const url_recuperar = "appgestantes.polijr.com.br/api/externo/esqueci-minha-senh
 const notif =  require('./notifications');
 const path = require('path');
 
-let senhaFixaPosto = "aNg_8(EdoW6gpsircd@C";
+let senhaFixaPosto = "testedamamae";
 
 noToken = true;
 confirmacaoEmail = false;
