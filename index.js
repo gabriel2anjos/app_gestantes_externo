@@ -4,7 +4,7 @@ var cors = require('cors')
 var app = express();
 var bodyParser = require('body-parser')
 var MongoClient = require('mongodb').MongoClient;
-var mongo_url = "mongodb://gestantes:NSWFpj17@207.38.86.52:29684/gestantes";
+var mongo_url = "mongodb://gestantes:NSWFpj17@127.0.0.1/gestantes";
 
 
 app.use(cors())
@@ -96,7 +96,7 @@ function homePage(req, res, next) {
 MongoClient.connect(mongo_url).then(client =>{
     const db = client.db('gestantes');
     app.locals.db = db;
-    var server = app.listen(17221, function () {
+    var server = app.listen(17221,'127.0.0.1', function () {
         var host = server.address().address
         var port = server.address().port
         console.log("Example app listening at http://%s:%s", host, port)
